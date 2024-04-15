@@ -12,24 +12,23 @@ export default class DatabaseService {
   // helper methods
   // call this with the `$set` part of the update statement
   _setModified = (findObj) => {
-    return { ...findObj, modified: Date.now() };
-  };
-
-  _setDeleted = () => {
-    return { deleted: Date.now() };
-  };
-
-  _findNondeleted = (findObj) => {
-    return { ...findObj, deleted: { $exists: false } };
+    console.log("findObj: ", findObj);
+    const res = { ...findObj, modified: Date.now() };
+    console.log("res: ", res);
+    return res;
   };
 
   _findById = (id) => {
     console.log("id: ", id);
-    return this._findNondeleted({ _id: new ObjectId(id) });
+    return { _id: new ObjectId(id) };
   };
 
   _findByUserId = (userId) => {
-    return { userId: userId };
+    return { userId: new ObjectId(userId) };
+  };
+
+  _findByUserIdAndId = (userId, id) => {
+    return { ...this._findByUserId(userId), ...this._findById(id) };
   };
 
   // user -> doesn't currently use deleted, so not using helper methods above
@@ -45,36 +44,44 @@ export default class DatabaseService {
     return await this.db.collection(TRANSACTIONS).insertOne(transaction);
   };
 
-  // userspaces
+  // transactions
   getTransactionsForUserId = async (userId) => {
     return await this.db
       .collection(TRANSACTIONS)
       .find(this._findByUserId(userId))
       // .project({ _id: 1, name: 1, created: 1, modified: 1 })
+      .project({ userId: 0 })
       .toArray();
   };
 
-  // userspace
-  findTransaction = async (transactionId) => {
-    return await this.db
-      .collection(TRANSACTIONS)
-      .findOne(this._findById(transactionId));
-  };
-
-  deleteTransaction = async (transactionId) => {
-    return await this.db
-      .collection(TRANSACTIONS)
-      .updateOne(this._findById(transactionId), {
-        $set: this._setDeleted(),
-      });
-  };
-
-  updateTransactionName = async (transactionId, transactionName) => {
+  // transaction
+  saveTransaction = async (userId, transaction) => {
+    console.log("transaction: ", transaction);
+    const id = transaction._id;
+    // need to make sure we don't have an _id on the document, if we are inserting, it will get created,
+    // if we are updating, we aren't allowed to set it
+    delete transaction._id;
     return await this.db
       .collection(TRANSACTIONS)
       // first arg is the "find", second is the "update"
-      .updateOne(this._findById(transactionId), {
-        $set: this._setModified({ name: transactionName }),
-      });
+      .findOneAndUpdate(
+        this._findByUserIdAndId(userId, id),
+        {
+          $setOnInsert: {
+            userId: new ObjectId(userId),
+          },
+          $set: this._setModified(transaction),
+        },
+        {
+          upsert: true,
+          returnDocument: "after",
+        }
+      );
+  };
+
+  deleteTransaction = async (userId, transactionId) => {
+    return await this.db
+      .collection(TRANSACTIONS)
+      .deleteOne(this._findById(userId, transactionId));
   };
 }

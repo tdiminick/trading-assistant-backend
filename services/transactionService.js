@@ -1,9 +1,11 @@
+import { ObjectId } from "mongodb";
+
 import logger from "./logger.js";
 
 const createTransaction = async (db, transactionName, userId) => {
   const transactionDoc = {
     name: transactionName,
-    userId: userId,
+    userId: new ObjectId(userId),
     created: Date.now(),
     modified: null,
     transactions: [],
@@ -36,10 +38,10 @@ const saveTransaction = async (db, userId, transaction) => {
 //   return await buildTransactionLists(db, transaction);
 // };
 
-// const deleteTransaction = async (db, transactionId, email) => {
-//   const result = await db.deleteTransaction(transactionId);
-//   return result;
-// };
+const deleteTransaction = async (db, userId, transactionId) => {
+  const result = await db.deleteTransaction(userId, transactionId);
+  return result;
+};
 
 // const updateTransactionName = async (db, transactionId, transactionName) => {
 //   const result = await db.updateTransactionName(transactionId, transactionName);
@@ -51,4 +53,6 @@ const saveTransaction = async (db, userId, transaction) => {
 
 export default {
   getTransactions,
+  saveTransaction,
+  deleteTransaction,
 };

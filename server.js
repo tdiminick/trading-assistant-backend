@@ -29,7 +29,7 @@ app.get("/api/transactions", auth, transactionCtrl.getTransactions);
 // app.post("/api/transaction", auth, transactionCtrl.createTransaction);
 // this method upserts, so handles both create and update methods
 app.put("/api/transaction", auth, transactionCtrl.saveTransaction);
-// app.delete("/api/transaction", auth, transactionCtrl.deleteTransaction);
+app.delete("/api/transaction", auth, transactionCtrl.deleteTransaction);
 // catch all route -- might be blocked by auth above
 app.get("*", (req, res) =>
   res.status(200).send({
