@@ -12,14 +12,11 @@ export default class DatabaseService {
   // helper methods
   // call this with the `$set` part of the update statement
   _setModified = (findObj) => {
-    console.log("findObj: ", findObj);
     const res = { ...findObj, modified: Date.now() };
-    console.log("res: ", res);
     return res;
   };
 
   _findById = (id) => {
-    console.log("id: ", id);
     return { _id: new ObjectId(id) };
   };
 
@@ -56,11 +53,12 @@ export default class DatabaseService {
 
   // transaction
   saveTransaction = async (userId, transaction) => {
-    console.log("transaction: ", transaction);
     const id = transaction._id;
     // need to make sure we don't have an _id on the document, if we are inserting, it will get created,
     // if we are updating, we aren't allowed to set it
     delete transaction._id;
+    // we setOnInsert, so we can delete since if we are just updating, we can't update this since we are using it as part of the find
+    delete transaction.userId;
     return await this.db
       .collection(TRANSACTIONS)
       // first arg is the "find", second is the "update"
@@ -82,6 +80,6 @@ export default class DatabaseService {
   deleteTransaction = async (userId, transactionId) => {
     return await this.db
       .collection(TRANSACTIONS)
-      .deleteOne(this._findById(userId, transactionId));
+      .deleteOne(this._findByUserIdAndId(userId, transactionId));
   };
 }
