@@ -35,7 +35,7 @@ const deleteTransaction = async (req, res) => {
   const result = await transactionService.deleteTransaction(
     db,
     userId,
-    transactionid
+    transactionId
   );
 
   return res.status(200).send(result);
