@@ -8,6 +8,7 @@ import Database from "./database/Database.js";
 import auth from "./middleware/authMiddleware.js";
 import userCtrl from "./controllers/userController.js";
 import transactionCtrl from "./controllers/transactionController.js";
+import stockCtrl from "./controllers/stockController.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -31,6 +32,7 @@ app.get("/api/transactions", auth, transactionCtrl.getTransactions);
 app.put("/api/transaction", auth, transactionCtrl.saveTransaction);
 app.delete("/api/transaction", auth, transactionCtrl.deleteTransaction);
 // catch all route -- might be blocked by auth above
+app.get("/api/stock/price/:symbol", auth, stockCtrl.getStockPrice);
 app.get("*", (req, res) =>
   res.status(200).send({
     message: "start of app",
