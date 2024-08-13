@@ -1,36 +1,34 @@
-import { ObjectId } from "mongodb";
+import { ObjectId } from 'mongodb';
 
-import logger from "./logger.js";
+import logger from './logger.js';
 
 const createTransaction = async (db, transactionName, userId) => {
-  const transactionDoc = {
-    name: transactionName,
-    userId: new ObjectId(userId),
-    created: Date.now(),
-    modified: null,
-    transactions: [],
-  };
-  const pResult = await db.insertTransaction(transactionDoc);
-  logger.info(
-    `A new transaction was created, ${transactionName}, id: ${pResult.insertedId}`
-  );
+	const transactionDoc = {
+		name: transactionName,
+		userId: new ObjectId(userId),
+		created: Date.now(),
+		modified: null,
+		transactions: [],
+	};
+	const pResult = await db.insertTransaction(transactionDoc);
+	logger.info(`A new transaction was created, ${transactionName}, id: ${pResult.insertedId}`);
 
-  return pResult.insertedId;
+	return pResult.insertedId;
 };
 
 // will eventually add permission checks, transactionion objects, etc here
 const getTransactions = async (db, userId) => {
-  let transactions = await db.getTransactionsForUserId(userId);
-  logger.info("transactions: ", transactions);
+	let transactions = await db.getTransactionsForUserId(userId);
+	logger.info('transactions: ', transactions.length);
 
-  return transactions;
+	return transactions;
 };
 
 const saveTransaction = async (db, userId, transaction) => {
-  let transactionResult = await db.saveTransaction(userId, transaction);
-  logger.info("transaction: ", transactionResult);
+	let transactionResult = await db.saveTransaction(userId, transaction);
+	logger.info('transaction: ', transactionResult);
 
-  return transactionResult;
+	return transactionResult;
 };
 
 // const getTransaction = async (db, transactionId) => {
@@ -39,8 +37,8 @@ const saveTransaction = async (db, userId, transaction) => {
 // };
 
 const deleteTransaction = async (db, userId, transactionId) => {
-  const result = await db.deleteTransaction(userId, transactionId);
-  return result;
+	const result = await db.deleteTransaction(userId, transactionId);
+	return result;
 };
 
 // const updateTransactionName = async (db, transactionId, transactionName) => {
@@ -52,7 +50,7 @@ const deleteTransaction = async (db, userId, transactionId) => {
 // };
 
 export default {
-  getTransactions,
-  saveTransaction,
-  deleteTransaction,
+	getTransactions,
+	saveTransaction,
+	deleteTransaction,
 };

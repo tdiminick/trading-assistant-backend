@@ -6,7 +6,7 @@
         "express": "^4.18.2",
         "jsonwebtoken": "^9.0.0",
         "loglevel": "^1.8.1",
-        "mongodb": "6.5",
+        "mongodb": "6.8",
         "morgan": "^1.10.0",
         "nodemon": "^3.1.0",
         "puppeteer": "^23.0.2"
