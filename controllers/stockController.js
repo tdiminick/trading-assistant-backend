@@ -12,7 +12,7 @@ const getStockPrice = async (req, res) => {
 	try {
 		// evaluate and find the proper element
 		const result = await page.evaluate(() => {
-			return document.querySelector('fin-streamer.price')?.textContent;
+			return document.querySelector('fin-streamer.price')?.textContent || document.querySelector('fin-streamer.livePrice')?.textContent;
 		});
 
 		// make sure it's a number
@@ -24,8 +24,9 @@ const getStockPrice = async (req, res) => {
 		return res.status(200).send({ price: result });
 	} catch (error) {
 		logger.error('error scraping price: ', error);
-		await browser.close();
 		return res.status(400);
+	} finally {
+		await browser.close();
 	}
 };
 
